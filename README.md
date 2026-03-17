@@ -1,6 +1,110 @@
-# Inverse Methods TD 6 — Environment (GPU) Setup Results
+# Neural Networks for Image Classification (Kidney Histopathology)
 
-This workspace is configured to run the histopathology notebook(s) with **GPU-enabled PyTorch** using a local virtual environment.
+This repo contains notebook-based work for **kidney histopathology image patch classification**. The goal is to build machine learning / deep learning models that map an input RGB image patch to one of five clinically relevant classes.
+
+## Task
+
+**What are we predicting?**
+
+Given an image patch, predict its class label:
+
+$$\text{image} \rightarrow \text{tumor class}$$
+
+where the class is one of:
+
+- `Chromo` — Chromophobe renal cell carcinoma
+- `Onco` — Oncocytoma
+- `ccRCC` — Clear cell renal cell carcinoma
+- `pRCC` — Papillary renal cell carcinoma
+- `normal` — Healthy kidney tissue
+
+The dataset is split into `train/`, `val/`, and `test/`. The **test set class distribution differs** from the training set, to better simulate real clinical conditions.
+
+## Dataset
+
+### Description
+
+The dataset contains RGB histopathology image patches of kidney tissue organized into training, validation, and test sets. It is intended to support development of models capable of classifying patches into the five diagnostic categories above.
+
+### Structure
+
+```text
+Histo images/
+|
+|-- train/
+|   |-- Chromo/
+|   |-- Onco/
+|   |-- ccRCC/
+|   |-- normal/
+|   `-- pRCC/
+|
+|-- val/
+|   |-- Chromo/
+|   |-- Onco/
+|   |-- ccRCC/
+|   |-- normal/
+|   `-- pRCC/
+|
+|-- test/
+|   |-- Chromo/
+|   |-- Onco/
+|   |-- ccRCC/
+|   |-- normal/
+|   `-- pRCC/
+|
+`-- best_ckpt.pth
+```
+
+Examples:
+
+```text
+train/ccRCC/0001.png
+train/normal/0234.png
+train/Onco/1023.png
+```
+
+### Image format
+
+- File format: PNG
+- Image type: RGB patches
+- Resolution: varies (commonly resized to 224×224 for CNNs)
+
+### Checkpoint
+
+`best_ckpt.pth` is a pretrained PyTorch checkpoint (ResNet-based) that can be used for transfer learning or feature extraction.
+
+Note: the dataset and checkpoint are intentionally excluded from git via `.gitignore` to keep the repo lightweight.
+
+## What the notebook does
+
+The main notebooks in this repo (e.g. `starter-notebook.ipynb`) implement a typical end-to-end workflow:
+
+### Part 1 — Dataset inspection and loading
+
+- Load `train/`, `val/`, `test/` from the dataset directory
+- Print class counts per split
+- Create `torchvision.datasets.ImageFolder` datasets
+- Apply standard transforms: resize to `224×224`, `ToTensor()`, and ImageNet normalization
+- (Optional) remove corrupted images by attempting to open/verify each file
+- Build `DataLoader`s for batching
+
+### Part 2 — Baseline classifier using handcrafted features
+
+- Define a feature extractor `extract_features(img)` for simple hand-crafted cues (e.g., color/texture)
+- Build feature matrices for train/val/test
+- Train a small classifier in PyTorch (`FeatureClassifier`)
+- Evaluate with accuracy + confusion matrices, and compute macro Recall/F1
+
+### Part 3 — Deep feature extraction with a CNN
+
+- Load a ResNet model (`torchvision.models.resnet50`)
+- Optionally load pretrained weights from `best_ckpt.pth`
+- Use the CNN as a feature extractor to produce deep embeddings
+- Train a classifier on top of deep features and evaluate again (metrics + confusion matrices)
+
+## Environment (GPU) setup results
+
+This workspace is configured to run the notebooks with **GPU-enabled PyTorch** using a local virtual environment.
 
 ## What was created / used
 
@@ -88,3 +192,4 @@ python -m pip install -r requirements.txt
 
 - The first CUDA-enabled PyTorch install can download a **large wheel** (multi-GB). That’s expected for GPU builds.
 - If CUDA is ever reported as unavailable inside the notebook, restart the kernel and re-run the verification snippet above.
+
