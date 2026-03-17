@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Data / artifacts (keep repo light)
+Histo images/
+artificial-intelligencefor-histopathology/
+artificial-intelligencefor-histopathology.zip
+
+# Model checkpoints / weights
+*.pth
+*.pt
+*.onnx
+
+# Logs / caches
+*.log
+.cache/
